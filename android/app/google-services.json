@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "738673923151",
+    "firebase_url": "https://xelafy-cf29a.firebaseio.com",
+    "project_id": "xelafy-cf29a",
+    "storage_bucket": "xelafy-cf29a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738673923151:android:fb3ef29b19d292617d863a",
+        "android_client_info": {
+          "package_name": "com.example.xelafy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738673923151-j7c5gljnvrdrl5icfhfkh5k46jrk302h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFrFtJInZ4p_G-ejjfbwCR6uu-siNYTQI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "738673923151-j7c5gljnvrdrl5icfhfkh5k46jrk302h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
