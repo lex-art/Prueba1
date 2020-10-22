@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xelafy/pantallas/login.dart';
-import 'package:xelafy/pantallas/tabsCliente/calendario.dart';
+import 'package:xelafy/pantallas/tabsCliente/publicar.dart';
 import 'package:xelafy/pantallas/tabsCliente/inicio.dart';
 import 'package:xelafy/pantallas/tabsCliente/perfil.dart';
 import 'package:xelafy/servicios/autenticacion_service.dart';
@@ -87,7 +87,7 @@ class _ViewClienteState extends State<ViewCliente> {
               ),
               endDrawer: getDrawer(context),
               body: TabBarView(children: <Widget>[
-                Inicio(), PerfilCliente(), Calendario(),
+                Inicio(), PerfilCliente(), Publicar(),
               ]),
         ));
   }

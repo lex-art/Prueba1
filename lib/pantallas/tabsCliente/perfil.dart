@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:xelafy/pantallas/chat/chat_screen.dart';
+import 'package:xelafy/servicios/autenticacion_service.dart';
 import 'package:xelafy/servicios/serviciosUsuarios.dart';
+
+var loggedInUser;
 
 class PerfilCliente extends StatefulWidget {
   @override
@@ -8,6 +11,25 @@ class PerfilCliente extends StatefulWidget {
 }
 
 class _PerfilClienteState extends State<PerfilCliente> {
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+  }
+
+  ///para saber que usaruio se logueo hacemos un metodo para reconoces el usuario
+  ///lo hacemos con frirebase, u.u es tan facil
+  void getCurrentUser() async {
+    //como lo fijimos firenbase trabaj con progra asyncrona y por eso se usa await y async
+    var user = await Authenticacion().getCurrentUser(); //obtenemos el usaurio
+    //le pasamos el usuriuo que trajimos de firebase y la asignamos la loggedInUdser
+    if (user != null) {
+      setState(() {
+        loggedInUser = user;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,10 +39,14 @@ class _PerfilClienteState extends State<PerfilCliente> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 10),
-          child: Center(            
+          child: Center(
               child: Text(
             "Músicos Diponibles",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 25,
+              color: Theme.of(context).accentColor,
+            ),
             textAlign: TextAlign.center,
           )),
         ),
@@ -102,11 +128,14 @@ class MusicoItem extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(id: id, nombre: nombre,),
-              ));
-                
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        idDestino: id,
+                        nombre: nombre,
+                        idEnvia: loggedInUser.uid,
+                      ),
+                    ));
               },
             )),
       ),

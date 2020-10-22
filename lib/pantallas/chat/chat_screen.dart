@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:xelafy/servicios/autenticacion_service.dart';
 import 'package:xelafy/servicios/message_service.dart';
 
+bool tipo = false;
+
 class ChatScreen extends StatefulWidget {
-  final String id, nombre;
-  ChatScreen({this.id, this.nombre});
+  final String idDestino, idEnvia, nombre;
+  ChatScreen({this.idDestino, this.idEnvia, this.nombre});
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -21,7 +23,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   //guardamos el usuario que nos llega desde firebase, para poder crear una especie de sesion en la app
   // ignore: deprecated_member_use
-  FirebaseUser loggedInUser;
+  var loggedInUser;
 
   //estilos para el text field
   InputDecoration _messageTextFieldDecoration = InputDecoration(
@@ -29,21 +31,16 @@ class _ChatScreenState extends State<ChatScreen> {
       hintText: 'Ingrese su mensaje aqui.....');
 
   BoxDecoration _messageContainerDecoration = BoxDecoration(
-      border:
-          Border(top: BorderSide(color: Colors.lightBlueAccent, width: 2.0)));
+      border: Border(top: BorderSide(color: Color(0xff961916), width: 2.0)));
 
   TextStyle _sendButtonStryle = TextStyle(
-      color:Color(0xff961916),
-      fontWeight: FontWeight.bold,
-      fontSize: 18.0);
+      color: Color(0xff961916), fontWeight: FontWeight.bold, fontSize: 18.0);
   //init satate es como un constructor, es la primera funcion que se gatilla cuando se ejecuta esta pantalla
   @override
   void initState() {
     super.initState();
     getCurrentUser();
     _getMessages();
-
-    print(widget.id);
   }
 
   ///para saber que usaruio se logueo hacemos un metodo para reconoces el usuario
@@ -54,7 +51,8 @@ class _ChatScreenState extends State<ChatScreen> {
     //le pasamos el usuriuo que trajimos de firebase y la asignamos la loggedInUdser
     if (user != null) {
       loggedInUser = user;
-      print(loggedInUser.email);
+      //print(widget.idDestino + " destino ++++++++++++++++++++++++++++++++++");
+      //print(widget.idEnvia + " envia ++++++++++++++++++++++++++++++++++");
     }
   }
 
@@ -78,9 +76,8 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Contacatar a: ${widget.nombre}"),
+        title: Text("Contactar a: ${widget.nombre}"),
         backgroundColor: Color(0xff961916),
-        
       ),
       //pantalla de chat  DIseño
       body: SafeArea(
@@ -89,8 +86,10 @@ class _ChatScreenState extends State<ChatScreen> {
             //implementacion del stream builder
             StreamBuilder(
                 //recibe dos parametros
-                stream: MessageService()
-                    .getMessageStream(), //escucha los datos que llegan del stream
+                stream: MessageService().getMessageStream(
+                  idEnvia: widget.idEnvia,
+                  idDestino: widget.idDestino,
+                ), //escucha los datos que llegan del stream
                 builder: (context, snapshot) {
                   //este metodo se activa cada vez que el stream esucha algun dato nuevo en el stream y re-renderiza la app
                   //obtenemos los datos desde firestore
@@ -129,13 +128,16 @@ class _ChatScreenState extends State<ChatScreen> {
                     onPressed: () {
                       ///collection recibe varios parametros para guardar en la bd primero la coleccion
                       ///luego llamamos a la funcion add para agregar los datos
-                      MessageService()
-                          .save(collectionName: "message", collectionValues: {
-                        'value': _messageController
-                            .text, //unasmos un controler para capturar los datos del estic text
-                        'sender': loggedInUser.email,
-                        'timestamp': DateTime.now()
-                      });
+                      MessageService().save(
+                          collectionName: "usuario",
+                          idEnvia: widget.idEnvia,
+                          idDestino: widget.idDestino,
+                          collectionValues: {
+                            'value': _messageController
+                                .text, //unasmos un controler para capturar los datos del estic text
+                            'sender': loggedInUser.email,
+                            'timestamp': DateTime.now()
+                          });
                       _messageController.clear();
                     },
                   )
@@ -151,14 +153,15 @@ class _ChatScreenState extends State<ChatScreen> {
     //aqui es el correo de quien lo envia
     List<ChatItem> chatItems = [];
     for (var message in messages) {
-      final messagesValue = message.data["value"];
-      final messagesSender = message.data["sender"];
+      final messagesValue = message.data()["value"];
+      final messagesSender = message.data()["sender"];
       //style: TextStyle(fontSize: 20.0),
       chatItems.add(ChatItem(
           //con isloggedInUser podemos ver quien manda el msj, comparamos quien envia con el usaurio que incio sesion
           message: messagesValue,
           sender: messagesSender,
           isLoggedInUser: messagesSender == loggedInUser.email));
+      //print(message + "-----------------------");
 
       //));
 
