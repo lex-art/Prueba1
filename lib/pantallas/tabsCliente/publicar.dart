@@ -33,6 +33,7 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xff247898),
       body: SingleChildScrollView(
         child: Form(
             key: _formkey,
@@ -40,11 +41,11 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
               padding: const EdgeInsets.only(top: 10.0, right: 50, left: 50),
               child: Column(
                 children: <Widget>[
-                  Text("Comparte tu contenido",
+                  Text("Publica tu solicitud",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 25,
-                        color: Theme.of(context).accentColor,
+                        color: Colors.white
                       )),
                   SizedBox(
                     height: 15,
@@ -128,14 +129,15 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
         onPressed: () async {
           if (_formkey.currentState.validate()) {
             ServicioUsuario().creaPublicacionMusico(
-                collectionName: "publicacionMusico",
+                collectionName: "publicaciones",
                 collectionValues: {
                   "titulo": _tituloController.text,
                   "descripcion": _decripcionController.text,
                   "enlace": _enlaceController.text,
                   "nombre": nombre,
                   "telefono": telefono,
-                  "correo": correo
+                  "correo": correo,
+                  "tipoUsuario": "Particular"
                 });
             Navigator.push(
                 context,

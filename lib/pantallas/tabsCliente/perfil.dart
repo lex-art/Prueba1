@@ -34,6 +34,7 @@ class _PerfilClienteState extends State<PerfilCliente> {
   Widget build(BuildContext context) {
     return Scaffold(
         //padding: EdgeInsets.only(left: 25, right: 25),
+        backgroundColor: Color(0xff247898),
         body: SafeArea(
             child: Column(
       children: [
@@ -45,13 +46,13 @@ class _PerfilClienteState extends State<PerfilCliente> {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 25,
-              color: Theme.of(context).accentColor,
+              color: Colors.white,
             ),
             textAlign: TextAlign.center,
           )),
         ),
         StreamBuilder(
-            stream: ServicioUsuario().getMusicoStream('usuario'),
+            stream: ServicioUsuario().getCollectionStream('usuario'),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Flexible(
@@ -81,6 +82,8 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
         nombre: musico.data()["nombres"],
         apellido: musico.data()["apellidos"],
         descripcion: musico.data()["descripcion"],
+        correo: musico.data()["correo"],
+        telefono: musico.data()["telefono"],
       ));
     }
   }
@@ -88,19 +91,21 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
 }
 
 class MusicoItem extends StatelessWidget {
-  final String id, nombre, apellido, descripcion;
+  final String id, nombre, apellido, descripcion, telefono, correo;
   const MusicoItem({
     this.id,
     this.nombre,
     this.apellido,
     this.descripcion,
+    this.correo,
+    this.telefono
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      height: 115,
+      height: 120,
       width: double.maxFinite,
       child: Card(
         elevation: 5,
@@ -124,7 +129,15 @@ class MusicoItem extends StatelessWidget {
                 children: [Text("$nombre $apellido")],
               ),
               subtitle: Container(
-                child: Text("Músico\n$descripcion"),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Correo: $correo'),
+                    Text('cel: $telefono'),
+                    Text("Músico\n$descripcion"),
+
+                  ],
+                )
               ),
               onTap: () {
                 Navigator.push(

@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:xelafy/pantallas/ayuda.dart';
 import 'package:xelafy/pantallas/login.dart';
 import 'package:xelafy/pantallas/tabsCliente/publicar.dart';
 import 'package:xelafy/pantallas/tabsCliente/inicio.dart';
 import 'package:xelafy/pantallas/tabsCliente/perfil.dart';
 import 'package:xelafy/servicios/autenticacion_service.dart';
 
+import 'editarCliente.dart';
+
 class ViewCliente extends StatefulWidget {
+  final String id, nombre, apellido, telefono, tipo, descrip, correo;
+  ViewCliente({
+    this.id,
+    this.nombre,
+    this.apellido,
+    this.telefono,
+    this.tipo,
+    this.descrip,
+    this.correo
+  });
   @override
   _ViewClienteState createState() => _ViewClienteState();
 }
@@ -25,9 +38,21 @@ class _ViewClienteState extends State<ViewCliente> {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) =>Login()),
                 (Route<dynamic> route) => false);
+          }  if (route == "/edit") {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditarCliente(id: widget.id, nombre: widget.nombre, apellido: widget.apellido, telefono: widget.telefono, tipo: widget.tipo,descrip: widget.descrip, correo: widget.correo,),
+                ));
+          } if (route == "/help") {
+            
+             Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>Ayuda()));
           } else {
             Navigator.pushNamed(context, route);
-          }          
+          }        
         },
       );
     }
@@ -69,7 +94,7 @@ class _ViewClienteState extends State<ViewCliente> {
         child: Scaffold(
           appBar: AppBar(
               backgroundColor: Color(0xff961916),
-              title: Text("Bienvenido cliente"),
+              title: Text("Bienvenido a Xelafy"),
   
               bottom: TabBar(
                 tabs: <Widget>[

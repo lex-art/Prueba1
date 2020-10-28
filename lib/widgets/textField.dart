@@ -12,21 +12,22 @@ class AppTextField extends StatelessWidget {
   //controlar la posición del parpadeo
   final FocusNode focusNode;
   //tipo de teclado
-    //para que cuando haya un error y despues se corrija este desaparezca el error
+  //para que cuando haya un error y despues se corrija este desaparezca el error
   final bool autoValidate;
-
+  //llave para poder hacer las pruebas
+  final Key key;
   final FormFieldValidator<String> validator;
 
   // constructor
-  const AppTextField({
-    this.inputText,
-    this.onSaved,
-    this.controller,
-    this.focusNode,
-    this.obscureText,
-    this.validator,
-    this.autoValidate
-  });
+  const AppTextField(
+      {this.inputText,
+      this.onSaved,
+      this.controller,
+      this.focusNode,
+      this.obscureText,
+      this.validator,
+      this.autoValidate,
+      this.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +37,7 @@ class AppTextField extends StatelessWidget {
       //para la autovalidacion de los textfield
       // autovalidate: autoValidate,
       validator: validator,
-      
+      key: key,
       //pa posicionar el texto en un text field
       focusNode: focusNode, //posiciona el cursor
       controller: controller, //limpiar el texto3
@@ -52,13 +53,13 @@ class AppTextField extends StatelessWidget {
         ///tamaño del textField
         hintText: inputText,
         border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(50.0))),
+            borderRadius: BorderRadius.all(Radius.circular(15.0))),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(50.0)),
+          borderRadius: BorderRadius.all(Radius.circular(15.0)),
           borderSide: BorderSide(color: Color(0xff247898), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(50.0)),
+            borderRadius: BorderRadius.all(Radius.circular(15.0)),
             borderSide: BorderSide(color: Color(0xff247898), width: 1)),
       ),
       onSaved: onSaved, //guarda lo que se intruduce en el textfield

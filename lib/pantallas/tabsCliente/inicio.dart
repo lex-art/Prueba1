@@ -13,6 +13,7 @@ class _InicioState extends State<Inicio> {
   Widget build(BuildContext context) {
     return Scaffold(
         //padding: EdgeInsets.only(left: 25, right: 25),
+        backgroundColor: Color(0xff247898),
         body: SafeArea(
             child: Column(
       children: [
@@ -24,13 +25,13 @@ class _InicioState extends State<Inicio> {
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 25,
-              color: Theme.of(context).accentColor,
+              color: Colors.white,
             ),
             textAlign: TextAlign.center,
           )),
         ),
         StreamBuilder(
-            stream: ServicioUsuario().getMusicoStream('publicacionMusico'),
+            stream: ServicioUsuario().getPublicacionStream('publicaciones'),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Flexible(
@@ -48,7 +49,6 @@ class _InicioState extends State<Inicio> {
     )));
   }
 }
-
 //mapeamos los datos del stream
 List<ItemPulicacion> _getMusicoItem(dynamic publicaciones) {
   List<ItemPulicacion> publicaionItem = [];
@@ -61,26 +61,31 @@ List<ItemPulicacion> _getMusicoItem(dynamic publicaciones) {
       descripcion: publicacion.data()["descripcion"],
       enlace: publicacion.data()["enlace"],
       tel: publicacion.data()["telefono"],
+      fecha: publicacion.data()["fecha"],
+      tipo: publicacion.data()["tipoUsuario"],
     ));
   }
   return publicaionItem;
 }
 
 class ItemPulicacion extends StatelessWidget {
-  final String titulo, descripcion, enlace, correo, tel, nombre;
+  final String titulo, descripcion, enlace, correo, tel, nombre, fecha, tipo;
+
   const ItemPulicacion(
       {this.nombre,
       this.titulo,
       this.descripcion,
       this.enlace,
       this.correo,
-      this.tel});
+      this.tel,
+      this.fecha,
+      this.tipo});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      height: 200,
+      height: 180,
       width: double.maxFinite,
       child: Card(
         elevation: 5,
@@ -89,33 +94,41 @@ class ItemPulicacion extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(titulo,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(titulo,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text("$fecha"),                      
+                ],
+              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InkWell(
                       child: Icon(
-                        Icons.queue_play_next,
-                        color: Theme.of(context).accentColor,
+                        Icons.link,
+                        color: Color(0xff961916),
                         size: 120,
                       ),
-                      onTap: () => launch(
-                          "https://www.youtube.com/watch?v=DMrFMuUcM4o&list=TLPQMjIxMDIwMjDdeVLgsySxNg&index=15")),
+                      onTap: () => launch(enlace)),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(nombre,
+                        Text("Nombre: $nombre",
                             style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold)),
-                        Text(tel,
+                                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
+                        Text("Cel: $tel",
                             style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold)),
-                        Text(correo,
+                                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black45)),
+                        Text("Contacto: $correo",
                             style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold)),
+                                fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black45)),
+                        Text("Profesión: $tipo",
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold, color:  Colors.black45)),
                         SizedBox(height: 15.0),
                         Text(descripcion, style: TextStyle(fontSize: 12)),
                       ],

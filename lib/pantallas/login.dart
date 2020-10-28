@@ -83,6 +83,7 @@ class _LoginState extends State<Login> with ValidarMixins {
       controller: _emailController,
       autoValidate: _autoValidate,
       validator: validarEmail,
+      key: ValueKey('textFielCorreo'),
       inputText: "Ingrese su correo",
       onSaved: (value) {},
     );
@@ -91,6 +92,7 @@ class _LoginState extends State<Login> with ValidarMixins {
   Widget _contra() {
     return AppTextField(
       autoValidate: _autoValidate,
+      key: ValueKey('textFielPass'),
       controller: _passwordController,
       inputText: "Ingrese su contraseña",
       validator: validarPassword,
@@ -148,6 +150,8 @@ class _LoginState extends State<Login> with ValidarMixins {
     usuarioLogueado = user;
     String idUser = usuarioLogueado.uid;
 
+    String nombre, apellidos, cel, tipo, descrip, correo;
+
     //todos los datos de la coleccion
     final usuarios = await UsuarioService().getUsers('usuario');
     for (var usuario in usuarios.docs) {
@@ -156,24 +160,34 @@ class _LoginState extends State<Login> with ValidarMixins {
       if (usuario.id == idUser) {
         //si es el mismo usuairo, ahora vemos que rol tiene
         if (usuario.get("tiposUsuario") == "Músico") {
-          print("aqui-------------------------------------");
+          nombre = usuario.get("nombres");
+          apellidos = usuario.get("apellidos");
+          cel = usuario.get("telefono");
+          tipo = usuario.get("tiposUsuario");
+          descrip = usuario.get("descripcion");
+          correo = usuario.get("correo");
           //por ultimo lo redirigimos a la pagina que quiere
           //--redirige la pagina
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ViewMusico(),
+                builder: (context) => ViewMusico(id: usuario.id, nombre: nombre, apellido: apellidos, telefono: cel, tipo: tipo, descrip: descrip, correo: correo,),
               ));
-         
         }
         if (usuario.get("tiposUsuario") == "Particular") {
+          nombre = usuario.get("nombres");
+          apellidos = usuario.get("apellidos");
+          cel = usuario.get("telefono");
+          tipo = usuario.get("tiposUsuario");
+          descrip = usuario.get("descripcion");
+          correo = usuario.get("correo");
           //--redirige la pagina
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ViewCliente(),
+                builder: (context) => ViewCliente(id: usuario.id, nombre: nombre, apellido: apellidos, telefono: cel, tipo: tipo, descrip: descrip, correo: correo,),
               ));
-        } 
+        }
       } //else {
       ///print("111-------" + idUser);
       ///print("222-------" + usuario.id);

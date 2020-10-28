@@ -4,8 +4,11 @@ class ServicioUsuario {
   final _fireStore = FirebaseFirestore.instance;
 
   //-------------- suscripcion(con snapshot) a firestore para obtener los registros de los niños---------
-  Stream<QuerySnapshot> getMusicoStream(String collectionName) {
+  Stream<QuerySnapshot> getCollectionStream(String collectionName) {
     return _fireStore.collection(collectionName).snapshots();
+  }
+   Stream<QuerySnapshot> getPublicacionStream(String collectionName) {
+    return _fireStore.collection(collectionName).orderBy('fecha',descending: true).snapshots();
   }
 
   void creaPublicacionMusico({

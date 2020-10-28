@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:xelafy/modelo/auth_respuesta.dart';
 
 class UsuarioService {
   //una isntacia de firestore para guardar datos
   // ignore: deprecated_member_use
   final _fireStore = Firestore.instance;
+   final _auth = FirebaseAuth.instance;
 
   ///Map <String, dynamic> asigna una  clave String con el  valor dinámico. Dado que la
   ///clave es siempre una cadena y el valor puede ser de cualquier tipo , se mantiene tan
@@ -25,6 +27,16 @@ class UsuarioService {
     _fireStore.collection(collectionName).doc(id).set(collectionValues);
   }
 
+  void actualizarUsuario(
+      {String id,
+      String collectionName,
+      Map<String, dynamic> collectionValues, String email, String pass}) {
+
+      _auth.currentUser.updateEmail(email);
+      _auth.currentUser.updatePassword(pass);
+    _fireStore.collection(collectionName).doc(id).update(collectionValues);
+  }
+
   ///metodo para obtener los usuarios
   Future<QuerySnapshot> getUsers(String collectionName) async {
     // ignore: deprecated_member_use
@@ -32,7 +44,7 @@ class UsuarioService {
   }
 
   ///metodo para obtener los usuarios
-  Future<DocumentSnapshot> getUser(String collectionName,String id) async {
+  Future<DocumentSnapshot> getUser(String collectionName, String id) async {
     // ignore: deprecated_member_use
     return await _fireStore.collection(collectionName).doc(id).get();
   }
@@ -88,7 +100,7 @@ class UsuarioService {
         authRequest.mensajeError = "El correo es incorrecto";
         break;
       case 'unknown':
-        authRequest.mensajeError= "Ingrese todos los datos";
+        authRequest.mensajeError = "Ingrese todos los datos";
         break;
       case 'weak-password':
         authRequest.mensajeError = "Su contraseña es muy débil";
