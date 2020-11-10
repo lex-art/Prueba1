@@ -98,7 +98,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     // var messages = snapshot.data.documents;
                     // List<Text> messageWidgets = [];
                     //messageWidgets.add(Text(
-                    //'$messagesValue de $messagesSender',
+                    //'$messagesValue de $messagesSender'
 
                     //re renderizar en la app, flexible permite adaptarse al tamaño de nuestro dispositivo
                     //y permita hacer scroll
@@ -108,8 +108,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           snapshot.data.documents), //messageWidgets,
                     ));
                   }
-                  return null;
+                  return Container();
                 }),
+
             Container(
                 decoration: _messageContainerDecoration,
                 child: Row(children: <Widget>[
@@ -129,7 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       ///collection recibe varios parametros para guardar en la bd primero la coleccion
                       ///luego llamamos a la funcion add para agregar los datos
                       MessageService().save(
-                          collectionName: "usuario",
+                          collectionName: "usuarios",
                           idEnvia: widget.idEnvia,
                           idDestino: widget.idDestino,
                           collectionValues: {
@@ -138,6 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             'sender': loggedInUser.email,
                             'timestamp': DateTime.now()
                           });
+                      setState(() {});
                       _messageController.clear();
                     },
                   )
@@ -153,8 +155,9 @@ class _ChatScreenState extends State<ChatScreen> {
     //aqui es el correo de quien lo envia
     List<ChatItem> chatItems = [];
     for (var message in messages) {
-      final messagesValue = message.data()["value"];
       final messagesSender = message.data()["sender"];
+      final messagesValue = message.data()["value"];
+      print(messagesValue);
       //style: TextStyle(fontSize: 20.0),
       chatItems.add(ChatItem(
           //con isloggedInUser podemos ver quien manda el msj, comparamos quien envia con el usaurio que incio sesion
@@ -162,9 +165,6 @@ class _ChatScreenState extends State<ChatScreen> {
           sender: messagesSender,
           isLoggedInUser: messagesSender == loggedInUser.email));
       //print(message + "-----------------------");
-
-      //));
-
     }
     return chatItems;
   }
@@ -184,18 +184,22 @@ class ChatItem extends StatelessWidget {
         padding: EdgeInsets.all(10.0),
         //nos permitira poner un msj encima del otro
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: isLoggedInUser
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             Text(
               sender,
               style: TextStyle(fontSize: 15.0, color: Colors.black54),
             ), //es el usuario que mando el msj
             //el msj, lo envolevemos en una tipo burbuja con material
+            SizedBox(
+              height: 5,
+            ),
             Material(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(30.0),
-                    bottomLeft: Radius.circular(30.0),
-                    bottomRight: Radius.circular(30.0)),
+                    bottomRight: Radius.circular(30)),
                 elevation: 5.0,
                 color: isLoggedInUser ? Colors.lightBlueAccent : Colors.white,
                 child: Padding(

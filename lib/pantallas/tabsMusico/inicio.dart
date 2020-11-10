@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xelafy/servicios/serviciosUsuarios.dart';
-import 'package:xelafy/widgets/cardPublicacion.dart';
 
 class InicioMusico extends StatefulWidget {
   @override
@@ -129,7 +128,7 @@ class ItemPulicacion extends StatelessWidget {
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black45)),
-                        Text("Contacto: $correo",
+                        Text("E-mail: $correo",
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,

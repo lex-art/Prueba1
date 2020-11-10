@@ -12,9 +12,9 @@ import 'package:xelafy/widgets/textField.dart';
 
 import 'login.dart';
 
-class EditarCliente extends StatefulWidget {
+class EditarUsuario extends StatefulWidget {
   final String id, nombre, apellido, telefono, tipo, descrip, correo;
-  EditarCliente(
+  EditarUsuario(
       {this.id,
       this.nombre,
       this.apellido,
@@ -23,10 +23,10 @@ class EditarCliente extends StatefulWidget {
       this.descrip,
       this.correo});
   @override
-  _EditarClienteState createState() => _EditarClienteState();
+  _EditarUsuarioState createState() => _EditarUsuarioState();
 }
 
-class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
+class _EditarUsuarioState extends State<EditarUsuario> with ValidarMixins {
   TextEditingController _nomnbreController = TextEditingController();
   TextEditingController _apellidoController = TextEditingController();
   TextEditingController _telController = TextEditingController();
@@ -42,9 +42,8 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   var _lista = ["Músico", "Usuario"];
   //seleccion del rol
-  String _tiposUsuario = "Músico";
+  String _tiposUsuario = "Usuario";
   String _mensajeError = "";
-
   File sampleImage; // va obtner la images de la galeria
 
   //guardamos el usuario que nos llega desde firebase, para poder crear una especie de sesion en la app
@@ -92,13 +91,13 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
         title: Text("Edita tus datos "),
       ),
       backgroundColor: Color(0xff247898),
-      body: ModalProgressHUD(
-        inAsyncCall: showSpinner,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.only(left: 30, right: 30, top: 20),
-          child: Column(
-            children: [
-              Form(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(left: 30, right: 30, top: 20),
+        child: Column(
+          children: [
+            ModalProgressHUD(
+              inAsyncCall: showSpinner,
+              child: Form(
                 key: _formkey,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -162,15 +161,18 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
                           height: 15,
                         ),
                         _contra(),
+                        SizedBox(
+                          height: 15,
+                        ),
                         _actualizar(),
                         _showErrorMessage()
                       ],
                     ),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -256,7 +258,8 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
         nombre: "Actualizar",
         onPressed: () async {
           if (_formkey.currentState.validate()) {
-             setSpinnerStatus(true);
+            setSpinnerStatus(true);
+
             //primero guardamos la imagen que se subio
 
             if (sampleImage != null) {
@@ -270,6 +273,7 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
               uploadTask.whenComplete(() async {
                 try {
                   imgUrl = await imageReferencia.getDownloadURL();
+                  // await Future.delayed(Duration(seconds: 15));
                   print(imgUrl.toString() + "-------------awqui-555----------");
 
                   UsuarioService().actualizarUsuario(
@@ -282,7 +286,7 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
                       "correo": _emailController.text,
                       "descripcion": _descrController.text,
                       "tiposUsuario": _tiposUsuario,
-                      "FotoPerfil": await imgUrl.toString(),
+                      "FotoPerfil": imgUrl.toString(),
                     },
                     email: _emailController.text,
                     pass: _passwordController.text,
@@ -296,6 +300,8 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
                 }
               });
             } else {
+              //guardamos los datos del usuario creado
+
               UsuarioService().actualizarUsuario(
                 id: widget.id,
                 collectionName: 'usuarios',
@@ -316,14 +322,14 @@ class _EditarClienteState extends State<EditarCliente> with ValidarMixins {
                   (Route<dynamic> route) => false);
             }
 
-           // _nomnbreController.text = "";
-           // _apellidoController.text = "";
-           // _telController.text = "";
-           // _emailController.text = "";
-           // _passwordController.text = "";
-           // _descrController.text = "";
+            // _nomnbreController.text = "";
+            // _apellidoController.text = "";
+            // _telController.text = "";
+            // _emailController.text = "";
+            // _passwordController.text = "";
+            // _descrController.text = "";
             FocusScope.of(context).requestFocus(_focusNode);
-            setSpinnerStatus(false);           
+            setSpinnerStatus(false);
           } else {
             setState(() {
               setState(() => _autoValidate = true);

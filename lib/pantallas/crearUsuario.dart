@@ -29,7 +29,7 @@ class _CrearUsurioState extends State<CrearUsurio> with ValidarMixins {
   bool _autoValidate = false;
   //un global key permite referenciar a un formulario y desde él tener accesos al estado de un textFormfield
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  var _lista = ["Músico", "Particular"];
+  var _lista = ["Músico", "Usuario"];
   //seleccion del rol
   String _tiposUsuario = "Músico";
   String _mensajeError = "";
@@ -211,7 +211,7 @@ class _CrearUsurioState extends State<CrearUsurio> with ValidarMixins {
               //guardamos los datos del usuario creado
               UsuarioService().crearUsuarior(
                 id: usuarioLogueado.uid,
-                collectionName: 'usuario',
+                collectionName: 'usuarios',
                 collectionValues: {
                   "nombres": _nomnbreController.text,
                   "apellidos": _apellidoController.text,
@@ -219,25 +219,23 @@ class _CrearUsurioState extends State<CrearUsurio> with ValidarMixins {
                   "correo": _emailController.text,
                   "descripcion": _descrController.text,
                   "tiposUsuario": _tiposUsuario,
+                  "FotoPerfil":"",
                 },
               );
 
-              if (_tiposUsuario == "Músico") {
-                print("aqui-------------------------------------");
-                //por ultimo lo redirigimos a la pagina que quiere
-                //--redirige la pagina
+              if (_tiposUsuario == "Músico") { 
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ViewMusico(),
+                      builder: (context) => Login(),
                     ));
               }
-              if (_tiposUsuario == "Particular") {
+              if (_tiposUsuario == "Usuario") {
                 //--redirige la pagina
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ViewCliente(),
+                      builder: (context) => Login(),
                     ));
               }
 

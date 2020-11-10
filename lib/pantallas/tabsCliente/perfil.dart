@@ -37,37 +37,37 @@ class _PerfilClienteState extends State<PerfilCliente> {
         backgroundColor: Color(0xff247898),
         body: SafeArea(
             child: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Center(
-              child: Text(
-            "Músicos Diponibles",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 25,
-              color: Colors.white,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Center(
+                  child: Text(
+                "Músicos Diponibles",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              )),
             ),
-            textAlign: TextAlign.center,
-          )),
-        ),
-        StreamBuilder(
-            stream: ServicioUsuario().getCollectionStream('usuario'),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Flexible(
-                    child: ListView(
-                  children: _getMusicoItem(snapshot.data.documents),
-                ));
-              } else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Center(child: CircularProgressIndicator())],
-                );
-              }
-            })
-      ],
-    )));
+            StreamBuilder(
+                stream: ServicioUsuario().getCollectionStream('usuarios'),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Flexible(
+                        child: ListView(
+                      children: _getMusicoItem(snapshot.data.documents),
+                    ));
+                  } else {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Center(child: CircularProgressIndicator())],
+                    );
+                  }
+                })
+          ],
+        )));
   }
 }
 
@@ -84,6 +84,7 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
         descripcion: musico.data()["descripcion"],
         correo: musico.data()["correo"],
         telefono: musico.data()["telefono"],
+        urlPhoto: musico.data()["FotoPerfil"],
       ));
     }
   }
@@ -91,66 +92,63 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
 }
 
 class MusicoItem extends StatelessWidget {
-  final String id, nombre, apellido, descripcion, telefono, correo;
+  final String id, nombre, apellido, descripcion, telefono, correo, urlPhoto;
+  
   const MusicoItem({
     this.id,
     this.nombre,
     this.apellido,
     this.descripcion,
     this.correo,
-    this.telefono
+    this.telefono,
+    this.urlPhoto,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {   
     return Container(
       padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
       height: 120,
       width: double.maxFinite,
       child: Card(
         elevation: 5,
-        child: Padding(
-            padding: const EdgeInsets.all(10.0),
+        child: Container(
             child: ListTile(
-              leading: CircleAvatar(
-                radius: 25,
-                child: Text(nombre[0].toUpperCase()),
-                backgroundColor: Theme.of(context).accentColor,
-              ),
-
-              //leading: CircleAvatar(
-              //  radius: 25,
-              //  //child: Text(nombre[0].toUpperCase()),
-              //backgroundColor: Theme.of(context).buttonColor,
-              //backgroundImage: NetworkImage(
-              //  'https://www.pudahuel.cl/wp-content/uploads/2020/05/ed65840db7f27b76abf2431bdcee5e81-768x517.jpg'),
-              // ),
-              title: Row(
-                children: [Text("$nombre $apellido")],
-              ),
-              subtitle: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Correo: $correo'),
-                    Text('cel: $telefono'),
-                    Text("Músico\n$descripcion"),
-
-                  ],
+          leading: urlPhoto  == ""
+              ? CircleAvatar(
+                  radius: 35.0,
+                  child: Text(nombre[0].toUpperCase()),
+                  backgroundColor: Theme.of(context).accentColor,
                 )
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        idDestino: id,
-                        nombre: nombre,
-                        idEnvia: loggedInUser.uid,
-                      ),
-                    ));
-              },
-            )),
+              : CircleAvatar(
+                  backgroundColor: Theme.of(context).buttonColor,
+                  backgroundImage: NetworkImage(urlPhoto),
+                  radius: 35.0,
+                ),
+          title: Row(
+            children: [Text("$nombre $apellido")],
+          ),
+          subtitle: Container(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Correo: $correo'),
+              Text('cel: $telefono'),
+              Text("Músico\n$descripcion"),
+            ],
+          )),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(
+                    idDestino: id,
+                    nombre: nombre,
+                    idEnvia: loggedInUser.uid,
+                  ),
+                ));
+          },
+        )),
       ),
     );
   }

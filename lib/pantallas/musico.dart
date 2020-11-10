@@ -6,10 +6,10 @@ import 'package:xelafy/pantallas/tabsMusico/inicio.dart';
 import 'package:xelafy/pantallas/tabsMusico/perfil.dart';
 import 'package:xelafy/servicios/autenticacion_service.dart';
 
-import 'editarUsuario.dart';
+import 'editarMusico.dart';
 
 class ViewMusico extends StatefulWidget {
-  final String id, nombre, apellido, telefono, tipo, descrip, correo;
+  final String id, nombre, apellido, telefono, tipo, descrip, correo, urlPhoto;
   ViewMusico(
       {this.id,
       this.nombre,
@@ -17,7 +17,8 @@ class ViewMusico extends StatefulWidget {
       this.telefono,
       this.tipo,
       this.descrip,
-      this.correo});
+      this.correo,
+      this.urlPhoto});
   @override
   _ViewMusicoState createState() => _ViewMusicoState();
 }
@@ -103,7 +104,28 @@ class _ViewMusicoState extends State<ViewMusico> {
         child: Scaffold(
           appBar: AppBar(
               backgroundColor: Color(0xff961916),
-              title: Text("Bienvenido músico"),
+              title: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  
+                  children: [
+                    
+                    Text("Bienvenido músico"),
+                    widget.urlPhoto == ""
+                        ? CircleAvatar(
+                            radius: 23.0,
+                            child: Text(widget.nombre[0].toUpperCase()),
+                            backgroundColor: Theme.of(context).accentColor,
+                          )
+                        : CircleAvatar(
+                            backgroundColor: Theme.of(context).buttonColor,
+                            backgroundImage: NetworkImage(widget.urlPhoto),
+                            radius: 23.0,
+                          ),
+                  ],
+                ),
+              ),
               bottom: TabBar(
                 tabs: <Widget>[
                   Tab(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:xelafy/pantallas/cliente.dart';
 import 'package:xelafy/pantallas/musico.dart';
 import 'package:xelafy/servicios/autenticacion_service.dart';
@@ -45,32 +46,41 @@ class _LoginState extends State<Login> with ValidarMixins {
     _emailController.dispose();
     _passwordController.dispose();
   }
-
+//metodo para la barra de progreso
+  void setSpinnerStatus(bool status) {
+    //re-renderizar la app para que muestre el progres bar
+    setState(() {
+      showSpinner = status;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff961916),
-      body: Form(
-        key: _formkey,
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 40.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AppLogo(),
-                SizedBox(
-                  height: 30,
-                ),
-                _correo(),
-                SizedBox(
-                  height: 15,
-                ),
-                _contra(),
-                _enviar(),
-                _crearUsuario(),
-                _showErrorMessage(),
-              ],
+      body: ModalProgressHUD(
+        inAsyncCall: showSpinner,
+              child: Form(
+          key: _formkey,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 40.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppLogo(),
+                  SizedBox(
+                    height: 30,
+                  ),
+                  _correo(),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  _contra(),
+                  _enviar(),
+                  _crearUsuario(),
+                  _showErrorMessage(),
+                ],
+              ),
             ),
           ),
         ),
@@ -107,6 +117,7 @@ class _LoginState extends State<Login> with ValidarMixins {
         nombre: "Ingresar",
         onPressed: () async {
           if (_formkey.currentState.validate()) {
+             setSpinnerStatus(true);
             var auth = await Authenticacion().loginUser(
                 email: _emailController.text,
                 password: _passwordController.text);
@@ -119,6 +130,7 @@ class _LoginState extends State<Login> with ValidarMixins {
                 _mensajeError = auth.mensajeError;
               });
             }
+             setSpinnerStatus(false);
           } else {
             setState(() {
               setState(() => _autoValidate = true);
@@ -150,10 +162,10 @@ class _LoginState extends State<Login> with ValidarMixins {
     usuarioLogueado = user;
     String idUser = usuarioLogueado.uid;
 
-    String nombre, apellidos, cel, tipo, descrip, correo;
+    String nombre, apellidos, cel, tipo, descrip, correo, url;
 
     //todos los datos de la coleccion
-    final usuarios = await UsuarioService().getUsers('usuario');
+    final usuarios = await UsuarioService().getUsers('usuarios');
     for (var usuario in usuarios.docs) {
       //print("-----------------------------------------${usuario.get("rol")}");
       //verificamos que sea el mismo usuario
@@ -166,26 +178,30 @@ class _LoginState extends State<Login> with ValidarMixins {
           tipo = usuario.get("tiposUsuario");
           descrip = usuario.get("descripcion");
           correo = usuario.get("correo");
+          url = usuario.get("FotoPerfil");
+
+
           //por ultimo lo redirigimos a la pagina que quiere
           //--redirige la pagina
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ViewMusico(id: usuario.id, nombre: nombre, apellido: apellidos, telefono: cel, tipo: tipo, descrip: descrip, correo: correo,),
+                builder: (context) => ViewMusico(id: usuario.id, nombre: nombre, apellido: apellidos, telefono: cel, tipo: tipo, descrip: descrip, correo: correo, urlPhoto: url),
               ));
         }
-        if (usuario.get("tiposUsuario") == "Particular") {
+        if (usuario.get("tiposUsuario") == "Usuario") {
           nombre = usuario.get("nombres");
           apellidos = usuario.get("apellidos");
           cel = usuario.get("telefono");
           tipo = usuario.get("tiposUsuario");
           descrip = usuario.get("descripcion");
           correo = usuario.get("correo");
+          url = usuario.get("FotoPerfil");
           //--redirige la pagina
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ViewCliente(id: usuario.id, nombre: nombre, apellido: apellidos, telefono: cel, tipo: tipo, descrip: descrip, correo: correo,),
+                builder: (context) => ViewCliente(id: usuario.id, nombre: nombre, apellido: apellidos, telefono: cel, tipo: tipo, descrip: descrip, correo: correo, urlPhoto: url),
               ));
         }
       } //else {

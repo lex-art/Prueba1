@@ -9,7 +9,7 @@ import 'package:xelafy/servicios/autenticacion_service.dart';
 import 'editarCliente.dart';
 
 class ViewCliente extends StatefulWidget {
-  final String id, nombre, apellido, telefono, tipo, descrip, correo;
+  final String id, nombre, apellido, telefono, tipo, descrip, correo, urlPhoto;
   ViewCliente({
     this.id,
     this.nombre,
@@ -17,15 +17,15 @@ class ViewCliente extends StatefulWidget {
     this.telefono,
     this.tipo,
     this.descrip,
-    this.correo
+    this.correo,
+    this.urlPhoto,
   });
   @override
   _ViewClienteState createState() => _ViewClienteState();
 }
 
 class _ViewClienteState extends State<ViewCliente> {
-
-  Drawer getDrawer(BuildContext context) {  
+  Drawer getDrawer(BuildContext context) {
     //opciones
     ListTile getItem(Icon icon, String description, String route) {
       return ListTile(
@@ -33,26 +33,33 @@ class _ViewClienteState extends State<ViewCliente> {
         title: Text(description),
         onTap: () {
           if (route == "salir") {
-           Authenticacion().singOut();
+            Authenticacion().singOut();
             //cerramos todas las pantallas abiertas de la app
             Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) =>Login()),
+                MaterialPageRoute(builder: (context) => Login()),
                 (Route<dynamic> route) => false);
-          }  if (route == "/edit") {
+          }
+          if (route == "/edit") {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => EditarCliente(id: widget.id, nombre: widget.nombre, apellido: widget.apellido, telefono: widget.telefono, tipo: widget.tipo,descrip: widget.descrip, correo: widget.correo,),
+                  builder: (context) => EditarCliente(
+                    id: widget.id,
+                    nombre: widget.nombre,
+                    apellido: widget.apellido,
+                    telefono: widget.telefono,
+                    tipo: widget.tipo,
+                    descrip: widget.descrip,
+                    correo: widget.correo,
+                  ),
                 ));
-          } if (route == "/help") {
-            
-             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>Ayuda()));
+          }
+          if (route == "/help") {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Ayuda()));
           } else {
             Navigator.pushNamed(context, route);
-          }        
+          }
         },
       );
     }
@@ -78,7 +85,7 @@ class _ViewClienteState extends State<ViewCliente> {
               )),
           getItem(Icon(Icons.edit), "Editar Perfil", "/edit"),
           getItem(Icon(Icons.help_outline), "Ayuda", "/help"),
-          getItem(Icon(Icons.exit_to_app), "Cerrar sesión", "salir"),         
+          getItem(Icon(Icons.exit_to_app), "Cerrar sesión", "salir"),
         ],
       );
     }
@@ -87,6 +94,7 @@ class _ViewClienteState extends State<ViewCliente> {
       child: getList(),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -94,8 +102,26 @@ class _ViewClienteState extends State<ViewCliente> {
         child: Scaffold(
           appBar: AppBar(
               backgroundColor: Color(0xff961916),
-              title: Text("Bienvenido a Xelafy"),
-  
+              title: Padding(
+                 padding: const EdgeInsets.only(top: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text("Bienvenido a Xelafy"),
+                    widget.urlPhoto == ""
+                        ? CircleAvatar(
+                            radius: 23.0,
+                            child: Text(widget.nombre[0].toUpperCase()),
+                            backgroundColor: Theme.of(context).accentColor,
+                          )
+                        : CircleAvatar(
+                            backgroundColor: Theme.of(context).buttonColor,
+                            backgroundImage: NetworkImage(widget.urlPhoto),
+                            radius: 23.0,
+                          ),
+                  ],
+                ),
+              ),
               bottom: TabBar(
                 tabs: <Widget>[
                   Tab(
@@ -108,12 +134,13 @@ class _ViewClienteState extends State<ViewCliente> {
                     icon: Icon(Icons.calendar_today),
                   ),
                 ],
-              )
-              ),
-              endDrawer: getDrawer(context),
-              body: TabBarView(children: <Widget>[
-                Inicio(), PerfilCliente(), Publicar(),
-              ]),
+              )),
+          endDrawer: getDrawer(context),
+          body: TabBarView(children: <Widget>[
+            Inicio(),
+            PerfilCliente(),
+            Publicar(),
+          ]),
         ));
   }
 }

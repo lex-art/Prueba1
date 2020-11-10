@@ -48,7 +48,7 @@ class _PerfilMusicoState extends State<PerfilMusico> {
           )),
         ),
         StreamBuilder(
-            stream: ServicioUsuario().getCollectionStream('usuario'),
+            stream: ServicioUsuario().getCollectionStream('usuarios'),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Flexible(
@@ -72,7 +72,7 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
   List<MusicoItem> musicoItem = [];
 
   for (var musico in musicos) {
-    if (musico.data()["tiposUsuario"] == "Particular") {
+    if (musico.data()["tiposUsuario"] == "Usuario") {
       musicoItem.add(MusicoItem(
         id: musico.id,
         nombre: musico.data()["nombres"],
@@ -80,6 +80,7 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
         descripcion: musico.data()["descripcion"],
         correo: musico.data()["correo"],
         telefono: musico.data()["telefono"],
+        urlPhoto: musico.data()["FotoPerfil"], 
       ));
     }
   }
@@ -87,7 +88,7 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
 }
 
 class MusicoItem extends StatelessWidget {
-  final String id, nombre, apellido, descripcion, telefono, correo;
+  final String id, nombre, apellido, descripcion, telefono, correo, urlPhoto;
   const MusicoItem({
     this.id,
     this.nombre,
@@ -95,6 +96,7 @@ class MusicoItem extends StatelessWidget {
     this.descripcion,
     this.correo,
     this.telefono,
+    this.urlPhoto,
   });
 
   @override
@@ -108,11 +110,17 @@ class MusicoItem extends StatelessWidget {
         child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: ListTile(
-              leading: CircleAvatar(
-                radius: 25,
-                child: Text(nombre[0].toUpperCase()),
-                backgroundColor: Theme.of(context).accentColor,
-              ),
+              leading: urlPhoto  == ""
+              ? CircleAvatar(
+                  radius: 35.0,
+                  child: Text(nombre[0].toUpperCase()),
+                  backgroundColor: Theme.of(context).accentColor,
+                )
+              : CircleAvatar(
+                  backgroundColor: Theme.of(context).buttonColor,
+                  backgroundImage: NetworkImage(urlPhoto),
+                  radius: 35.0,
+                ),
 
               //leading: CircleAvatar(
               //  radius: 25,
