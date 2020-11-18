@@ -19,7 +19,7 @@ class _CalendarioMusicoState extends State<CalendarioMusico>
   //un global key permite referenciar a un formulario y desde él tener accesos al estado de un textFormfield
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   bool _autovalidate = false;
-  String telefono, nombre, correo;
+  String id, apellido, tipo, descrip, urlPhoto, telefono, nombre, correo;
   var usuarioLogueado;
   TextEditingController _tituloController = TextEditingController();
   TextEditingController _decripcionController = TextEditingController();
@@ -107,22 +107,33 @@ class _CalendarioMusicoState extends State<CalendarioMusico>
     String idUser = usuarioLogueado.uid;
 
     //todos los datos de la coleccion
-    final usuarios = await UsuarioService().getUsers('usuario');
+    final usuarios = await UsuarioService().getUsers('usuarios');
     for (var usuario in usuarios.docs) {
       //print("-----------------------------------------${usuario.get("rol")}");
       //verificamos que sea el mismo usuario
       if (usuario.id == idUser) {
         //si es el mismo usuairo, ahora vemos que rol tiene
-        telefono = usuario.get("telefono");
-        nombre = usuario.get("nombres") + " " + usuario.get("apellidos");
-        correo = usuario.get("correo");
-        break;
-      }
-    } //else {
-    ///print("111-------" + idUser);
-    ///print("222-------" + usuario.id);
-    // print("Usuario no valido");
-    //}
+        if (usuario.get("tiposUsuario") == "Músico") {
+          nombre = usuario.get("nombres");
+          apellido = usuario.get("apellidos");
+          telefono = usuario.get("telefono");
+          tipo = usuario.get("tiposUsuario");
+          descrip = usuario.get("descripcion");
+          correo = usuario.get("correo");
+          urlPhoto = usuario.get("FotoPerfil");
+
+          break;
+        }
+        print("-----hhhhhh-----" + usuario.id);
+        print("-----jjjjjj-----" + idUser);
+        print("----------" + nombre);
+        print("----------" + telefono);
+      } //else {
+      ///print("111-------" + idUser);
+      ///print("222-------" + usuario.id);
+      // print("Usuario no valido");
+      //}
+    }
   }
 
   Widget _publicar() {
@@ -141,13 +152,22 @@ class _CalendarioMusicoState extends State<CalendarioMusico>
                   "nombre": nombre,
                   "telefono": telefono,
                   "correo": correo,
-                  "fecha": formatDate(now, [dd,'/',mm ,'/',yyyy]),
+                  "fecha": formatDate(now, [dd, '/', mm, '/', yyyy]),
                   "tipoUsuario": "Músico",
+                  "timestape": now, 
                 });
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ViewMusico(),
+                  builder: (context) => ViewMusico(
+                      id: id,
+                      nombre: nombre,
+                      apellido: apellido,
+                      telefono: telefono,
+                      tipo: tipo,
+                      descrip: descrip,
+                      correo: correo,
+                      urlPhoto: urlPhoto),
                 ));
           } else {
             setState(() {

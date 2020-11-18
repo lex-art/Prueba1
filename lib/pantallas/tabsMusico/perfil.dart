@@ -4,6 +4,8 @@ import 'package:xelafy/servicios/autenticacion_service.dart';
 import 'package:xelafy/servicios/serviciosUsuarios.dart';
 
 var loggedInUser;
+String nombreBusqueda;
+String filter;
 
 class PerfilMusico extends StatefulWidget {
   @override
@@ -11,10 +13,25 @@ class PerfilMusico extends StatefulWidget {
 }
 
 class _PerfilMusicoState extends State<PerfilMusico> {
+  TextEditingController searchController = new TextEditingController();
   @override
   void initState() {
     super.initState();
     getCurrentUser();
+
+    //para la busqueta incia el buscador
+    searchController.addListener(() {
+      setState(() {
+        filter = searchController.text;
+      });
+    });
+  }
+
+  //libera todos los recursos, el de buscar
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   ///para saber que usaruio se logueo hacemos un metodo para reconoces el usuario
@@ -37,33 +54,50 @@ class _PerfilMusicoState extends State<PerfilMusico> {
         backgroundColor: Color(0xff247898),
         body: SafeArea(
             child: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Center(
-              child: Text(
-            "Interesados",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25, color: Colors.white),
-            textAlign: TextAlign.center,
-          )),
-        ),
-        StreamBuilder(
-            stream: ServicioUsuario().getCollectionStream('usuarios'),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Flexible(
-                    child: ListView(
-                  children: _getMusicoItem(snapshot.data.documents),
-                ));
-              } else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Center(child: CircularProgressIndicator())],
-                );
-              }
-            })
-      ],
-    )));
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Center(
+                  child: Text(
+                "Interesados",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 25,
+                    color: Colors.white),
+                textAlign: TextAlign.center,
+              )),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 20.0, left: 20.0),
+              child: TextField(
+                  controller: searchController,                  
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Búscar usuario',
+                    contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 15.0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(32.0)),
+                  ),
+                ),
+            ),
+            StreamBuilder(
+                stream: ServicioUsuario().getCollectionStream('usuarios'),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Flexible(
+                        child: ListView(
+                      children: _getMusicoItem(snapshot.data.documents),
+                    ));
+                  } else {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [Center(child: CircularProgressIndicator())],
+                    );
+                  }
+                })
+          ],
+        )));
   }
 }
 
@@ -80,7 +114,7 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
         descripcion: musico.data()["descripcion"],
         correo: musico.data()["correo"],
         telefono: musico.data()["telefono"],
-        urlPhoto: musico.data()["FotoPerfil"], 
+        urlPhoto: musico.data()["FotoPerfil"],
       ));
     }
   }
@@ -101,61 +135,117 @@ class MusicoItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      height: 120,
-      width: double.maxFinite,
-      child: Card(
-        elevation: 5,
-        child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ListTile(
-              leading: urlPhoto  == ""
-              ? CircleAvatar(
-                  radius: 35.0,
-                  child: Text(nombre[0].toUpperCase()),
-                  backgroundColor: Theme.of(context).accentColor,
-                )
-              : CircleAvatar(
-                  backgroundColor: Theme.of(context).buttonColor,
-                  backgroundImage: NetworkImage(urlPhoto),
-                  radius: 35.0,
+    nombreBusqueda = nombre + " " + apellido;
+    return filter == null || filter == ""
+        ? Container(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+            height: 120,
+            width: double.maxFinite,
+            child: Card(
+              elevation: 5,
+              child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: ListTile(
+                    leading: urlPhoto == ""
+                        ? CircleAvatar(
+                            radius: 35.0,
+                            child: Text(nombre[0].toUpperCase()),
+                            backgroundColor: Theme.of(context).accentColor,
+                          )
+                        : CircleAvatar(
+                            backgroundColor: Theme.of(context).buttonColor,
+                            backgroundImage: NetworkImage(urlPhoto),
+                            radius: 35.0,
+                          ),
+
+                    //leading: CircleAvatar(
+                    //  radius: 25,
+                    //  //child: Text(nombre[0].toUpperCase()),
+                    //backgroundColor: Theme.of(context).buttonColor,
+                    //backgroundImage: NetworkImage(
+                    //  'https://www.pudahuel.cl/wp-content/uploads/2020/05/ed65840db7f27b76abf2431bdcee5e81-768x517.jpg'),
+                    // ),
+                    title: Row(
+                      children: [Text("$nombre $apellido")],
+                    ),
+                    subtitle: Container(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Correo: $correo'),
+                        Text('cel: $telefono'),
+                        Text("Interesado\n$descripcion"),
+                      ],
+                    )),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              idDestino: id,
+                              idEnvia: loggedInUser.uid,
+                              nombre: nombre,
+                            ),
+                          ));
+                    },
+                  )),
+            ),
+          )
+        : nombreBusqueda.toLowerCase().contains(filter.toLowerCase())
+            ? Container(
+                padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                height: 120,
+                width: double.maxFinite,
+                child: Card(
+                  elevation: 5,
+                  child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ListTile(
+                        leading: urlPhoto == ""
+                            ? CircleAvatar(
+                                radius: 35.0,
+                                child: Text(nombre[0].toUpperCase()),
+                                backgroundColor: Theme.of(context).accentColor,
+                              )
+                            : CircleAvatar(
+                                backgroundColor: Theme.of(context).buttonColor,
+                                backgroundImage: NetworkImage(urlPhoto),
+                                radius: 35.0,
+                              ),
+
+                        //leading: CircleAvatar(
+                        //  radius: 25,
+                        //  //child: Text(nombre[0].toUpperCase()),
+                        //backgroundColor: Theme.of(context).buttonColor,
+                        //backgroundImage: NetworkImage(
+                        //  'https://www.pudahuel.cl/wp-content/uploads/2020/05/ed65840db7f27b76abf2431bdcee5e81-768x517.jpg'),
+                        // ),
+                        title: Row(
+                          children: [Text("$nombre $apellido")],
+                        ),
+                        subtitle: Container(
+                            child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Correo: $correo'),
+                            Text('cel: $telefono'),
+                            Text("Interesado\n$descripcion"),
+                          ],
+                        )),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ChatScreen(
+                                  idDestino: id,
+                                  idEnvia: loggedInUser.uid,
+                                  nombre: nombre,
+                                ),
+                              ));
+                        },
+                      )),
                 ),
-
-              //leading: CircleAvatar(
-              //  radius: 25,
-              //  //child: Text(nombre[0].toUpperCase()),
-              //backgroundColor: Theme.of(context).buttonColor,
-              //backgroundImage: NetworkImage(
-              //  'https://www.pudahuel.cl/wp-content/uploads/2020/05/ed65840db7f27b76abf2431bdcee5e81-768x517.jpg'),
-              // ),
-              title: Row(
-                children: [Text("$nombre $apellido")],
-              ),
-              subtitle: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Correo: $correo'),
-                    Text('cel: $telefono'),
-                    Text("Interesado\n$descripcion"),
-
-                  ],
-                )
-              ),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        idDestino: id,
-                        idEnvia: loggedInUser.uid,
-                        nombre: nombre,
-                      ),
-                    ));
-              },
-            )),
-      ),
-    );
+              )
+            : Container();
   }
 }

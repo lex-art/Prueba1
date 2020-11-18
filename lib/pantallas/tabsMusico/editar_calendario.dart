@@ -1,6 +1,5 @@
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
-import 'package:xelafy/pantallas/cliente.dart';
 import 'package:xelafy/servicios/autenticacion_service.dart';
 import 'package:xelafy/servicios/crearUsuario_service.dart';
 import 'package:xelafy/servicios/serviciosUsuarios.dart';
@@ -8,12 +7,18 @@ import 'package:xelafy/validarDatos/validarMixins.dart';
 import 'package:xelafy/widgets/boton.dart';
 import 'package:xelafy/widgets/textField.dart';
 
-class Publicar extends StatefulWidget {
+import '../musico.dart';
+
+class EditarCalendarioMusico extends StatefulWidget {
+  final String id, titulo, descripcion, enlace;
+  EditarCalendarioMusico({this.id, this.titulo, this.descripcion, this.enlace});
+
   @override
-  _PublicarState createState() => _PublicarState();
+  _EditarCalendarioMusicoState createState() => _EditarCalendarioMusicoState();
 }
 
-class _PublicarState extends State<Publicar> with ValidarMixins {
+class _EditarCalendarioMusicoState extends State<EditarCalendarioMusico>
+    with ValidarMixins {
   //un global key permite referenciar a un formulario y desde él tener accesos al estado de un textFormfield
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   bool _autovalidate = false;
@@ -25,15 +30,18 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
   @override
   void initState() {
     super.initState();
-    _tituloController = TextEditingController();
-    _decripcionController = TextEditingController();
-    _enlaceController = TextEditingController();
+    _tituloController = TextEditingController(text: widget.titulo);
+    _decripcionController = TextEditingController(text: widget.descripcion);
+    _enlaceController = TextEditingController(text: widget.enlace);
     _getUser();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+            backgroundColor: Color(0xff961916),
+            title: Text("Edita esta publicaciones")),
       backgroundColor: Color(0xff247898),
       body: SingleChildScrollView(
         child: Form(
@@ -42,11 +50,11 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
               padding: const EdgeInsets.only(top: 10.0, right: 50, left: 50),
               child: Column(
                 children: <Widget>[
-                  Text("Publica tu solicitud",
+                  Text("Comparte tu contenido",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 25,
-                        color: Colors.white
+                        color: Colors.white,
                       )),
                   SizedBox(
                     height: 15,
@@ -60,7 +68,7 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
                     height: 15,
                   ),
                   _link(),
-                  _publicar(),
+                  _actualizar(),
                 ],
               ),
             )),
@@ -97,7 +105,7 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
     );
   }
 
-//--------------------------- Metodo para obtener el usaurios en la bd -----------
+  //--------------------------- Metodo para obtener el usaurios en la bd -----------
   void _getUser() async {
     //obtner el id del usuaio
     var user = await Authenticacion().getCurrentUser();
@@ -111,7 +119,7 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
       //verificamos que sea el mismo usuario
       if (usuario.id == idUser) {
         //si es el mismo usuairo, ahora vemos que rol tiene
-        if (usuario.get("tiposUsuario") == "Usuario") {
+        if (usuario.get("tiposUsuario") == "Músico") {
           nombre = usuario.get("nombres");
           apellido = usuario.get("apellidos");
           telefono = usuario.get("telefono");
@@ -122,27 +130,21 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
 
           break;
         }
-        print("-----hhhhhh-----" + usuario.id);
-        print("-----jjjjjj-----" + idUser);
-        print("----------" + nombre);
-        print("----------" + telefono);
-      } //else {
-      ///print("111-------" + idUser);
-      ///print("222-------" + usuario.id);
-      // print("Usuario no valido");
-      //}
+        
+      } 
     }
   }
 
-  Widget _publicar() {
+  Widget _actualizar() {
     return AppButton(
         color: Colors.blueAccent,
-        nombre: "Publicar",
+        nombre: "Actualizar",
         onPressed: () async {
           var now = DateTime.now().toUtc().toLocal();
           if (_formkey.currentState.validate()) {
-            ServicioUsuario().creaPublicacionMusico(
+            ServicioUsuario().editarPublicacion(
                 collectionName: "publicaciones",
+                idpublicacion: widget.id,
                 collectionValues: {
                   "titulo": _tituloController.text,
                   "descripcion": _decripcionController.text,
@@ -151,13 +153,12 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
                   "telefono": telefono,
                   "correo": correo,
                   "fecha": formatDate(now, [dd, '/', mm, '/', yyyy]),
-                  "tipoUsuario": "Usuario",
-                  "timestape": now, 
+                  "tipoUsuario": "Músico",             
                 });
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ViewCliente(
+                  builder: (context) => ViewMusico(
                       id: id,
                       nombre: nombre,
                       apellido: apellido,

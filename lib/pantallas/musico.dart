@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:xelafy/pantallas/ayuda.dart';
+import 'package:xelafy/pantallas/editarPublicaciones.dart';
 import 'package:xelafy/pantallas/login.dart';
 import 'package:xelafy/pantallas/tabsMusico/calendario.dart';
 import 'package:xelafy/pantallas/tabsMusico/inicio.dart';
@@ -7,6 +8,7 @@ import 'package:xelafy/pantallas/tabsMusico/perfil.dart';
 import 'package:xelafy/servicios/autenticacion_service.dart';
 
 import 'editarMusico.dart';
+
 
 class ViewMusico extends StatefulWidget {
   final String id, nombre, apellido, telefono, tipo, descrip, correo, urlPhoto;
@@ -54,11 +56,20 @@ class _ViewMusicoState extends State<ViewMusico> {
                 ));
           }
           if (route == "/help") {
-            
-             Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>Ayuda()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => Ayuda()));
+          }
+          if (route == "/editar") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => EditarPublicacion(id: widget.id,
+                 correo: widget.correo,                  
+                nombre: widget.nombre,
+                apellido: widget.apellido,
+                telefono: widget.telefono,
+                tipo: widget.telefono,
+                descrip: widget.descrip,
+                urlPhoto: widget.urlPhoto,                 
+                 )));
           } else {
             Navigator.pushNamed(context, route);
           }
@@ -86,6 +97,7 @@ class _ViewMusicoState extends State<ViewMusico> {
                 ],
               )),
           getItem(Icon(Icons.edit), "Editar Perfil", "/edit"),
+          getItem(Icon(Icons.help_outline), "Tus publicaciones", "/editar"),
           getItem(Icon(Icons.help_outline), "Ayuda", "/help"),
           getItem(Icon(Icons.exit_to_app), "Cerrar sesión", "salir"),
         ],
@@ -108,9 +120,7 @@ class _ViewMusicoState extends State<ViewMusico> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  
                   children: [
-                    
                     Text("Bienvenido músico"),
                     widget.urlPhoto == ""
                         ? CircleAvatar(

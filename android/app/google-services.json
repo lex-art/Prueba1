@@ -8,9 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:738673923151:android:fb3ef29b19d292617d863a",
+        "mobilesdk_app_id": "1:738673923151:android:d13b63bb7042ebd17d863a",
         "android_client_info": {
-          "package_name": "com.example.xelafy"
+          "package_name": "com.xelafy2020"
         }
       },
       "oauth_client": [

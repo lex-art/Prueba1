@@ -8,12 +8,14 @@ import 'package:xelafy/validarDatos/validarMixins.dart';
 import 'package:xelafy/widgets/boton.dart';
 import 'package:xelafy/widgets/textField.dart';
 
-class Publicar extends StatefulWidget {
+class EditarPublicar extends StatefulWidget {
+  final String id, titulo, descripcion, enlace;
+  EditarPublicar({this.id, this.titulo, this.descripcion, this.enlace});
   @override
-  _PublicarState createState() => _PublicarState();
+  _EditarPublicarState createState() => _EditarPublicarState();
 }
 
-class _PublicarState extends State<Publicar> with ValidarMixins {
+class _EditarPublicarState extends State<EditarPublicar> with ValidarMixins {
   //un global key permite referenciar a un formulario y desde él tener accesos al estado de un textFormfield
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   bool _autovalidate = false;
@@ -25,15 +27,18 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
   @override
   void initState() {
     super.initState();
-    _tituloController = TextEditingController();
-    _decripcionController = TextEditingController();
-    _enlaceController = TextEditingController();
+    _tituloController = TextEditingController(text: widget.titulo);
+    _decripcionController = TextEditingController(text:  widget.descripcion);
+    _enlaceController = TextEditingController(text:  widget.enlace);
     _getUser();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+            backgroundColor: Color(0xff961916),
+            title: Text("Historial de tus publicaciones")),
       backgroundColor: Color(0xff247898),
       body: SingleChildScrollView(
         child: Form(
@@ -60,7 +65,7 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
                     height: 15,
                   ),
                   _link(),
-                  _publicar(),
+                  _actualizar(),
                 ],
               ),
             )),
@@ -119,30 +124,23 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
           descrip = usuario.get("descripcion");
           correo = usuario.get("correo");
           urlPhoto = usuario.get("FotoPerfil");
-
           break;
         }
-        print("-----hhhhhh-----" + usuario.id);
-        print("-----jjjjjj-----" + idUser);
-        print("----------" + nombre);
-        print("----------" + telefono);
-      } //else {
-      ///print("111-------" + idUser);
-      ///print("222-------" + usuario.id);
-      // print("Usuario no valido");
-      //}
+       
+      }
     }
   }
 
-  Widget _publicar() {
+  Widget _actualizar() {
     return AppButton(
         color: Colors.blueAccent,
-        nombre: "Publicar",
+        nombre: "Actualizar",
         onPressed: () async {
           var now = DateTime.now().toUtc().toLocal();
           if (_formkey.currentState.validate()) {
-            ServicioUsuario().creaPublicacionMusico(
+            ServicioUsuario().editarPublicacion(
                 collectionName: "publicaciones",
+                idpublicacion: widget.id,
                 collectionValues: {
                   "titulo": _tituloController.text,
                   "descripcion": _decripcionController.text,
@@ -151,8 +149,7 @@ class _PublicarState extends State<Publicar> with ValidarMixins {
                   "telefono": telefono,
                   "correo": correo,
                   "fecha": formatDate(now, [dd, '/', mm, '/', yyyy]),
-                  "tipoUsuario": "Usuario",
-                  "timestape": now, 
+                  "tipoUsuario": "Usuario",                  
                 });
             Navigator.push(
                 context,

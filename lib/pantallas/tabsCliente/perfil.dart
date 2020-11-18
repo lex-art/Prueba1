@@ -4,6 +4,8 @@ import 'package:xelafy/servicios/autenticacion_service.dart';
 import 'package:xelafy/servicios/serviciosUsuarios.dart';
 
 var loggedInUser;
+String nombreBusqueda;
+String filter;
 
 class PerfilCliente extends StatefulWidget {
   @override
@@ -11,10 +13,25 @@ class PerfilCliente extends StatefulWidget {
 }
 
 class _PerfilClienteState extends State<PerfilCliente> {
+  TextEditingController searchController = new TextEditingController();
+
   @override
   void initState() {
     super.initState();
     getCurrentUser();
+    //para la busqueta incia el buscador
+    searchController.addListener(() {
+      setState(() {
+        filter = searchController.text;
+      });
+    });
+  }
+
+  //libera todos los recursos, el de buscar
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   ///para saber que usaruio se logueo hacemos un metodo para reconoces el usuario
@@ -50,6 +67,20 @@ class _PerfilClienteState extends State<PerfilCliente> {
                 ),
                 textAlign: TextAlign.center,
               )),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 20.0, left: 20.0),
+              child: TextField(
+                  controller: searchController,                  
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    hintText: 'Búscar Músico',
+                    contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 15.0),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(32.0)),
+                  ),
+                ),
             ),
             StreamBuilder(
                 stream: ServicioUsuario().getCollectionStream('usuarios'),
@@ -93,7 +124,7 @@ List<MusicoItem> _getMusicoItem(dynamic musicos) {
 
 class MusicoItem extends StatelessWidget {
   final String id, nombre, apellido, descripcion, telefono, correo, urlPhoto;
-  
+
   const MusicoItem({
     this.id,
     this.nombre,
@@ -105,51 +136,100 @@ class MusicoItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {   
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      height: 120,
-      width: double.maxFinite,
-      child: Card(
-        elevation: 5,
-        child: Container(
-            child: ListTile(
-          leading: urlPhoto  == ""
-              ? CircleAvatar(
-                  radius: 35.0,
-                  child: Text(nombre[0].toUpperCase()),
-                  backgroundColor: Theme.of(context).accentColor,
-                )
-              : CircleAvatar(
-                  backgroundColor: Theme.of(context).buttonColor,
-                  backgroundImage: NetworkImage(urlPhoto),
-                  radius: 35.0,
+  Widget build(BuildContext context) {
+    nombreBusqueda = nombre + " " + apellido;
+    return filter == null || filter == ""
+        ? Container(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+            height: 120,
+            width: double.maxFinite,
+            child: Card(
+              elevation: 5,
+              child: Container(
+                  child: ListTile(
+                leading: urlPhoto == ""
+                    ? CircleAvatar(
+                        radius: 35.0,
+                        child: Text(nombre[0].toUpperCase()),
+                        backgroundColor: Theme.of(context).accentColor,
+                      )
+                    : CircleAvatar(
+                        backgroundColor: Theme.of(context).buttonColor,
+                        backgroundImage: NetworkImage(urlPhoto),
+                        radius: 35.0,
+                      ),
+                title: Row(
+                  children: [Text(nombreBusqueda)],
                 ),
-          title: Row(
-            children: [Text("$nombre $apellido")],
-          ),
-          subtitle: Container(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Correo: $correo'),
-              Text('cel: $telefono'),
-              Text("Músico\n$descripcion"),
-            ],
-          )),
-          onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(
-                    idDestino: id,
-                    nombre: nombre,
-                    idEnvia: loggedInUser.uid,
-                  ),
-                ));
-          },
-        )),
-      ),
-    );
+                subtitle: Container(
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Correo: $correo'),
+                    Text('cel: $telefono'),
+                    Text("Músico\n$descripcion"),
+                  ],
+                )),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          idDestino: id,
+                          nombre: nombre,
+                          idEnvia: loggedInUser.uid,
+                        ),
+                      ));
+                },
+              )),
+            ),
+          )
+        : nombreBusqueda.toLowerCase().contains(filter.toLowerCase())
+            ? Container(
+                padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                height: 120,
+                width: double.maxFinite,
+                child: Card(
+                  elevation: 5,
+                  child: Container(
+                      child: ListTile(
+                    leading: urlPhoto == ""
+                        ? CircleAvatar(
+                            radius: 35.0,
+                            child: Text(nombre[0].toUpperCase()),
+                            backgroundColor: Theme.of(context).accentColor,
+                          )
+                        : CircleAvatar(
+                            backgroundColor: Theme.of(context).buttonColor,
+                            backgroundImage: NetworkImage(urlPhoto),
+                            radius: 35.0,
+                          ),
+                    title: Row(
+                      children: [Text(nombreBusqueda)],
+                    ),
+                    subtitle: Container(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Correo: $correo'),
+                        Text('cel: $telefono'),
+                        Text("Músico\n$descripcion"),
+                      ],
+                    )),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                              idDestino: id,
+                              nombre: nombre,
+                              idEnvia: loggedInUser.uid,
+                            ),
+                          ));
+                    },
+                  )),
+                ),
+              )
+            : Container();
   }
 }

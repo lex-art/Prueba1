@@ -2,12 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xelafy/servicios/serviciosUsuarios.dart';
 
+String filter;
+
 class InicioMusico extends StatefulWidget {
   @override
   _InicioMusicoState createState() => _InicioMusicoState();
 }
 
 class _InicioMusicoState extends State<InicioMusico> {
+  TextEditingController searchController = new TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    //para la busqueta incia el buscador
+    searchController.addListener(() {
+      setState(() {
+        filter = searchController.text;
+      });
+    });
+  }
+
+  //libera todos los recursos, el de buscar
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,6 +50,21 @@ class _InicioMusicoState extends State<InicioMusico> {
                 ),
                 textAlign: TextAlign.center,
               )),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                  top: 8.0, bottom: 8.0, right: 20.0, left: 20.0),
+              child: TextField(
+                controller: searchController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintText: 'Búscar publicación',
+                  contentPadding: EdgeInsets.fromLTRB(20.0, 5.0, 10.0, 15.0),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(32.0)),
+                ),
+              ),
             ),
             StreamBuilder(
                 stream: ServicioUsuario().getPublicacionStream('publicaciones'),
@@ -83,72 +120,143 @@ class ItemPulicacion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
-      height: 180,
-      width: double.maxFinite,
-      child: Card(
-        elevation: 5,
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(titulo,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Text("$fecha"),
-                ],
+    return filter == null || filter == ""
+        ? Container(
+            padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+            height: 180,
+            width: double.maxFinite,
+            child: Card(
+              elevation: 5,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(titulo,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
+                        Text("$fecha"),
+                      ],
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InkWell(
+                            child: Icon(
+                              Icons.link,
+                              color: Color(0xff961916),
+                              size: 120,
+                            ),
+                            onTap: () => launch(enlace)),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Nombre: $nombre",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87)),
+                              Text("Cel: $tel",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black45)),
+                              Text("E-mail: $correo",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black45)),
+                              Text("Profesión: $tipo",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black45)),
+                              SizedBox(height: 15.0),
+                              Text(descripcion, style: TextStyle(fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  InkWell(
-                      child: Icon(
-                        Icons.link,
-                        color: Color(0xff961916),
-                        size: 120,
-                      ),
-                      onTap: () => launch(enlace)),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
+            ),
+          )
+        : titulo.toLowerCase().contains(filter.toLowerCase())
+            ? Container(
+                padding: EdgeInsets.fromLTRB(20, 10, 20, 0),
+                height: 180,
+                width: double.maxFinite,
+                child: Card(
+                  elevation: 5,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Nombre: $nombre",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87)),
-                        Text("Cel: $tel",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black45)),
-                        Text("E-mail: $correo",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black45)),
-                        Text("Profesión: $tipo",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black45)),
-                        SizedBox(height: 15.0),
-                        Text(descripcion, style: TextStyle(fontSize: 12)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(titulo,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16)),
+                            Text("$fecha"),
+                          ],
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InkWell(
+                                child: Icon(
+                                  Icons.link,
+                                  color: Color(0xff961916),
+                                  size: 120,
+                                ),
+                                onTap: () => launch(enlace)),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Nombre: $nombre",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87)),
+                                  Text("Cel: $tel",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black45)),
+                                  Text("E-mail: $correo",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black45)),
+                                  Text("Profesión: $tipo",
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black45)),
+                                  SizedBox(height: 15.0),
+                                  Text(descripcion,
+                                      style: TextStyle(fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+                ),
+              )
+            : Container();
   }
 }
