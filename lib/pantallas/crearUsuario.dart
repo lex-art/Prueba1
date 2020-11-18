@@ -196,9 +196,8 @@ class _CrearUsurioState extends State<CrearUsurio> with ValidarMixins {
   Widget _resgistrar() {
     return AppButton(
         color: Colors.blueAccent,
-        nombre: "Registrarte",
+        nombre: "¿No tienes una cuenta? Regístrate ahora mismo",
         onPressed: () async {
-
           if (_formkey.currentState.validate()) {
             var auth = await Authenticacion().createUser(
                 email: _emailController.text,
@@ -219,11 +218,11 @@ class _CrearUsurioState extends State<CrearUsurio> with ValidarMixins {
                   "correo": _emailController.text,
                   "descripcion": _descrController.text,
                   "tiposUsuario": _tiposUsuario,
-                  "FotoPerfil":"",
+                  "FotoPerfil": "",
                 },
               );
 
-              if (_tiposUsuario == "Músico") { 
+              if (_tiposUsuario == "Músico") {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
